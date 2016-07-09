@@ -3,13 +3,10 @@
 var passport = require('passport');
 var path = require('path');
 var getAllLinks = require('./getAllLinks.js');
-module.exports = authRoutesMiddleware;
 
-var authRoutesMiddleware = {};
-
-authRoutesMiddleware.redirAuth = function(req, res, next) {
+function redirAuth(req, res, next) {
   if (req.isAuthenticated()) {
-    getAllLinks(req, res, function(err, links) {
+    getAllLinks(req, res, function(links, err) {
       if (err) {
         return res.status(500).render(path.resolve('views/login'), {err: err});
       }
@@ -20,16 +17,18 @@ authRoutesMiddleware.redirAuth = function(req, res, next) {
   }
 };
 
-authRoutesMiddleware.authenticate = passport.authenticate('local', {
-  successRedirect: '/cp',
-  failureRedirect: '/cp#incorrect'
-});
 
-authRoutesMiddleware.checkAuth = function(req, res, next) {
+function checkAuth(req, res, next) {
   if (req.isAuthenticated()) {
     return next()
   } else {
     logs.error('Unauthorized attempted to generate right');
     return res.render(path.resolve('views/login'));
   }
+  next();
+};
+
+module.exports = {
+  redirAuth: redirAuth,
+  checkAuth: checkAuth
 };

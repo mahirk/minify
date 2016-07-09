@@ -28,6 +28,9 @@ function postNewLink(req, res) {
         return throwErr(res, err);
       }
       logs.info('Finished', self.name)
+      if (sack.resStatus === 200) {
+        return res.redirect('/cp');
+      }
       return res.status(sack.resStatus).send(sack.resBody);
     }
   );
@@ -44,10 +47,15 @@ function checkInput_(sack, next) {
   if (!sack.body || !(sack.body.url && sack.body.mini))
     return next(new CallErr(method, CallErr.DataNotFound, 'No body found'));
 
-  if (sack.body.mini === 'cp')
+  if (sack.body.mini === 'cp' || sack.body.mini === 'generate')
     return next(new CallErr(method, CallErr.InvalidParam, 'Admin is a reserved name'));
 
-  next();
+  global.client.select(0, function(err, intr) {
+    if(err) {
+      return next(new CallErr(method, CallErr.DataNotFound, 'No request object found'));
+    }
+    next();
+  });
 }
 
 function checkDBforKey_(sack, next) {
@@ -66,12 +74,11 @@ function saveToRedis_(sack, next) {
   if (sack.valid > 0) {
     return next(new CallErr(method, CallErr.InvalidParam, 'Name already in use'));
   }
-
   // continues PROCESSING
   var url = util.format('%s_%s', sack.body.mini, 'url');
   var hits = util.format('%s_%s', sack.body.mini, 'hits');
   var setOp = global.client.multi();
-  setOp.set(sack.body.mini, sack.body.url);
+  setOp.set(url, sack.body.url);
   setOp.set(hits, 0);
   setOp.exec(function(err, result){
     if (err) {

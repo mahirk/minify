@@ -10,7 +10,7 @@
     "cors": "^2.7.1",
     "ejs": "*",
     "express": "^4.13.0",
-    "express-session": "^1.12.1",
+    "express-session": "^1.14.0",
     "glob": "^5.0",
     "mongoose": "~3.6.13",
     "morgan": "^1.6",

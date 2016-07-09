@@ -46,7 +46,12 @@ function checkInput_(sack, next) {
   if(!sack.params)
     return next(new CallErr(method, CallErr.ParamNotFound, 'No param found'));
 
-  next();
+  global.client.select(0, function(err, intr) {
+    if(err) {
+      return next(new CallErr(method, CallErr.DataNotFound, 'No request object found'));
+    }
+    next();
+  });
 }
 
 function formOutput_(sack, next) {

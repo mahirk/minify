@@ -1,9 +1,8 @@
-'use strict'
+module.exports = loginUser;
 
 var LocalStrategy = require('passport-local').Strategy;
 var passport = require('passport');
 var async = require('async');
-module.exports = loginUser;
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -23,6 +22,7 @@ function authUser(username, password, done) {
     password: password
   }
   async.series([
+      switchDb.bind(null, sack),
       checkDb.bind(null, sack),
       authenticateAcc.bind(null, sack)
     ],
@@ -30,21 +30,30 @@ function authUser(username, password, done) {
       if(err){
         return done(null, false, {message: "Incorrect Username or Password"});
       }
-      logs.info('Successfully authenticated user',);
+      logs.info('Successfully authenticated user');
       return done(null, username);
     }
   );
 }
 
+function switchDb(sack, next) {
+  global.client.select(1, function(err, intr) {
+    if(err) {
+      return next('DB NOT FOUND');
+    }
+    next();
+  });
+}
 function checkDb(sack, next) {
   global.client.get(sack.username, function(err, passToken) {
     if(err) {
       logs.error('Error finding id', sack.username);
       return next(err);
-    } else if(!redirectObject) {
+    } else if(!passToken) {
       logs.error('ID %s was not found.', sack.username);
       return next(err);
     } else {
+      logs.info('ID %s was found.', sack.username);
       sack.passToken = passToken;
       next();
     }
@@ -53,6 +62,7 @@ function checkDb(sack, next) {
 
 function authenticateAcc(sack, next) {
   if (!sack.passToken) {
+    logs.error('ID %s was not found.', sack.username);
     return next('ID was not found')
   }
   if (sack.passToken === sack.password) {

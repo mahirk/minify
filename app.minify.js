@@ -8,7 +8,6 @@
 // Load all the reqs
 var express    = require('express');
 var app        = express();
-var bodyParser = require('body-parser');
 var mongoose   = require('mongoose');
 var morgan   = require('morgan');
 var path = require('path');
@@ -44,14 +43,13 @@ app.use(function (req, res, next) {
 
 function startExpress() {
   logs.info('Starting', process.title);
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(require('body-parser').urlencoded({ extended: true }));
+  app.use(session({ secret: 'minify', resave: true, saveUninitialized: true}));
   app.use(morgan('dev'));
   app.set('views', './views');
   app.engine('html', require('ejs').renderFile);
   app.set('view engine', 'html');
   loadAuthentication(app);
-  createRoutes(app);
   app.use(express.static(path.join(__dirname, 'views')));
 }
 
@@ -59,16 +57,13 @@ function loadAuthentication(app) {
   app.use(passport.initialize());
   app.use(passport.session());
   require('./general/AuthStrategy.js')();
+  createRoutes(app);
 }
 
 function createRoutes(app){
-  activateRoute(app, './routes/routes.js');
+  logs.debug('Loading route file');
+  require('./routes/routes.js')(app);
   logs.info('ALL ROUTES LOADED');
-}
-
-function activateRoute(app, routeFile) {
-  logs.debug('Loading route file: ' + routeFile);
-  require(routeFile)(app);
   startRedis(app);
 }
 

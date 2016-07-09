@@ -26,8 +26,9 @@ function getAllLinks(req, res, callback) {
     ],
     function(err) {
       if(err){
-        return throwErr(res, err);
+        return callback(res, err);
       }
+      return callback(sack.resBody);
     }
   );
 }
@@ -38,14 +39,18 @@ function checkInput_(sack, next) {
 
   if(!sack.req)
     return next(new CallErr(method, CallErr.DataNotFound, 'No request object found'));
-
-  next();
+  global.client.select(0, function(err, intr) {
+    if(err) {
+      return next(new CallErr(method, CallErr.DataNotFound, 'No request object found'));
+    }
+    next();
+  });
 }
 
 function getKeys_(sack, next) {
   var method = self.name + ' | '+ getKeys_.name;
   logs.debug('In', method);
-  global.client.keys(*, function (err, keys) {
+  global.client.keys('*', function (err, keys) {
     if (err) {
       return next(new CallErr(method, CallErr.DBOperationFailed, 'Could not access Redis'));
     } else if (!keys) {
@@ -76,8 +81,17 @@ function getResults_(sack, next) {
   });
 }
 
-function createOutput_() {
+function createOutput_(sack, next) {
   var method = self.name + ' | '+ createOutput_.name;
   logs.debug('In', method);
-  
+  var prelimBody = _.object(sack.keys, sack.result);
+  sack.resBody = {};
+  _.each(prelimBody, function(value, key) {
+    var vals = key.split('_');
+    if(!sack.resBody[vals[0]]) {
+      sack.resBody[vals[0]] = {};
+    }
+    sack.resBody[vals[0]][vals[1]] = value;
+  });
+  next();
 }

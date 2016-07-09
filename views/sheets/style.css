@@ -132,9 +132,71 @@ MAIN PAGE
 .container .info span .fa {
   color: #EF3B3A;
 }
-.loginbody {
-  background: #3498db; /* fallback for old browsers */
-  font-family: "Roboto", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+/******************
+DISPLAY TABLE
+******************/
+
+table {
+    border: 0.5px solid #333;
+    width: 50%;
+    border-radius: 7px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 3em;
+}
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 6px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 6px;
+}
+
+table tr:first-child th:first-child {
+    border-top-left-radius: 6px;
+}
+
+table tr:first-child th:last-child {
+    border-top-right-radius: 6px;
+}
+
+th, td {
+  border: 0.5px solid #333;
+  padding: 10px;
+}
+
+/************
+CREATE FORM
+*************/
+
+.createnew {
+  margin-top: 3em;
+}
+
+.createnew input {
+  outline: 0;
+  background: #f2f2f2;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 7px;
+  width: 30%;
+  box-sizing: border-box;
+  font-size: 14px;
+  border-radius: 6px;
+}
+
+.createnew button {
+  background-color: #eb1b74;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  width: 10%;
+  font-weight: 300;
+  padding: 9px;
+  -webkit-appearance: none!important;
+  -webkit-appearance: none;
+  text-align: center;
+  cursor: pointer;
 }
