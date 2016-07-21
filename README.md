@@ -48,6 +48,24 @@ npm install forever
 forever start app.minify.js
 ```
 
+### Endpoints
+
+Public facing Routes
+
+```http
+GET / : GOES TO /cp
+GET /:mini : GETS THE MINIFIED LINK @ /:mini
+```
+
+Internal App Routes
+```http
+GET /cp : CONTROL PANEL
+GET /cp/all : ALL LINKS (RETURNS AN OBJECT) (requires a callback)
+POST /cp/login : LOGIN PAGE
+POST /generate: CREATE NEW LINK
+DEL /:mini : DELETE LINK
+```
+
 ## Customization
 
 The pages for the admin side can be modified to include the logo of the organization running the project. These files are available under `/views/*`.

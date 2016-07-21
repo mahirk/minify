@@ -2,7 +2,7 @@
 * Mahir Kothary
 * http://mahirk.com
 * Copyright 2016
-* GNU License
+* MIT License
 **/
 
 // Load all the reqs
